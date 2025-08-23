@@ -1,35 +1,83 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import css from './TagsMenu.module.css';
+import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import css from "./TagsMenu.module.css";
 
-const TagsMenu = () => {
-  const [dropdownIsOpen, setDropdownIsOpen] = useState(false);
+const TAGS = [
+  "All",
+  "Work",
+  "Personal",
+  "Meeting",
+  "Shopping",
+  "Ideas",
+  "Travel",
+  "Finance",
+  "Health",
+  "Important",
+  "Todo",
+];
 
-  const handleDropdownClose = () => {
-    setDropdownIsOpen(!dropdownIsOpen);
-  };
+export default function TagsMenu() {
+  const [isOpen, setIsOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLUListElement>(null);
+
+  const toggleMenu = () => setIsOpen((prev) => !prev);
+
+  useEffect(() => {
+    function onClickOutside(event: MouseEvent) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    }
+    if (isOpen) {
+      document.addEventListener("mousedown", onClickOutside);
+    } else {
+      document.removeEventListener("mousedown", onClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [isOpen]);
+
+  const handleLinkClick = () => setIsOpen(false);
+
   return (
     <div className={css.menuContainer}>
-      <button onClick={handleDropdownClose} className={css.menuButton}>
-        {dropdownIsOpen ? 'Notes ▴' : 'Notes ▾'}
+      <button
+        ref={buttonRef}
+        onClick={toggleMenu}
+        className={css.menuButton}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+      >
+        Notes {isOpen ? "▴" : "▾"}
       </button>
-      {dropdownIsOpen && (
-        <ul onClick={handleDropdownClose} className={css.menuList}>
-          {['All', 'Work', 'Personal', 'Meeting', 'Shopping', 'Todo'].map(
-            tag => (
-              <li key={tag} className={css.menuItem}>
-                <Link href={`/notes/filter/${tag}`} className={css.menuLink}>
+
+      {isOpen && (
+        <ul ref={menuRef} className={css.menuList} role="menu">
+          {TAGS.map((tag) => {
+            const href =
+              tag === "All" ? "/notes/filter/All" : `/notes/filter/${tag}`;
+            return (
+              <li key={tag} className={css.menuItem} role="none">
+                <Link
+                  href={href}
+                  className={css.menuLink}
+                  role="menuitem"
+                  onClick={handleLinkClick}
+                >
                   {tag}
                 </Link>
               </li>
-            )
-          )}
+            );
+          })}
         </ul>
       )}
     </div>
   );
 }
-
-export default TagsMenu;

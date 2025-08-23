@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Roboto } from 'next/font/google';
 import TanStackProvider from '@/components/TanStackProvider/TanStackProvider';
+import AuthProvider from '@/components/AuthProvider/AuthProvider';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 
@@ -51,11 +52,13 @@ export default function RootLayout({
       <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} ${robotoFont.variable}`}>
         <TanStackProvider>
-          <Header />
+          <AuthProvider>
+<Header />
           {children}
           {modal}
           <Footer />
           <div id="modal-root" />
+          </AuthProvider>
         </TanStackProvider>
       </body>
     </html>

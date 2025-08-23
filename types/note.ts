@@ -7,6 +7,7 @@ export interface Note {
   tag: NoteTag;
   createdAt: string;
   updatedAt: string;
+   userId: string;
 }
 
 export interface CreateNotePayload {

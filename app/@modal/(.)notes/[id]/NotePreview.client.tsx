@@ -4,8 +4,8 @@ import React, { useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import Modal from '@/components/Modal/Modal';
-import css from '@/components/Modal/Modal.module.css';
-import { fetchNoteById } from '@/lib/api';
+import css from "./NotePreview.module.css";
+import { fetchNoteById } from '@/lib/api/clientApi';
 
 const formatDate = (date?: string) => {
   return date ? new Date(date).toLocaleString() : 'N/A';

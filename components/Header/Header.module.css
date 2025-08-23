@@ -53,3 +53,6 @@
 .linkHeader:hover {
    color: #ddd;
 }
+.active {
+  border-bottom: 2px solid currentColor;
+}
