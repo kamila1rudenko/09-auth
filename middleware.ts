@@ -8,8 +8,8 @@ const AUTH_PAGES = ["/sign-in", "/sign-up"];
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  const isPrivate = PRIVATE_PREFIXES.some(p => pathname.startsWith(p));
-  const isAuthPage = AUTH_PAGES.includes(pathname);
+  const isPrivate = PRIVATE_PREFIXES.some((p) => pathname.startsWith(p));
+  const isAuthPage = AUTH_PAGES.some((p) => pathname.startsWith(p));
 
   const hasAccess =
     Boolean(req.cookies.get("accessToken")) ||
@@ -18,14 +18,12 @@ export function middleware(req: NextRequest) {
   if (isPrivate && !hasAccess) {
     const url = req.nextUrl.clone();
     url.pathname = "/sign-in";
-    url.searchParams.set("from", pathname);
+   url.searchParams.set("from", pathname);
     return NextResponse.redirect(url);
   }
 
   if (isAuthPage && hasAccess) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/profile";
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(new URL("/profile", req.url));
   }
 
   return NextResponse.next();

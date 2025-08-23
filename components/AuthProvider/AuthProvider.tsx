@@ -29,7 +29,7 @@ export default function AuthProvider({ children }: Props) {
         } else {
           clearAuth();
           if (isPrivatePath(pathname)) {
-            router.replace(`/sign-in?from=${encodeURIComponent(pathname)}`);
+            router.replace(`/sign-in?from=${pathname}`);
             return;
           }
         }

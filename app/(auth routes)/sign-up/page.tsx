@@ -1,31 +1,30 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { loginUser } from "@/lib/api/clientApi";
+import { registerUser } from "@/lib/api/clientApi";
 import { useAuthStore } from "@/lib/store/authStore";
-import css from "./SignInPage.module.css";
+import css from "./SignUpPage.module.css";
 
 interface ApiError {
   response?: { data?: { message?: string } };
 }
 
-export default function SignInPage() {
+export default function SignUpPage() {
   const router = useRouter();
-  const from = useSearchParams().get("from") || "/profile";
   const setUser = useAuthStore((s) => s.setUser);
   const [error, setError] = useState("");
 
   const { mutate, isPending } = useMutation({
     mutationFn: ({ email, password }: { email: string; password: string }) =>
-      loginUser(email, password),
+      registerUser(email, password),
     onSuccess: (user) => {
       setUser(user);
-      router.replace(from); 
+      router.replace("/profile");
     },
     onError: (err: ApiError) => {
-      setError(err?.response?.data?.message || "Login failed");
+      setError(err?.response?.data?.message || "Registration failed");
     },
   });
 
@@ -40,9 +39,8 @@ export default function SignInPage() {
 
   return (
     <main className={css.mainContent}>
+      <h1 className={css.formTitle}>Sign up</h1>
       <form className={css.form} onSubmit={handleSubmit}>
-        <h1 className={css.formTitle}>Sign in</h1>
-
         <div className={css.formGroup}>
           <label htmlFor="email">Email</label>
           <input
@@ -63,15 +61,20 @@ export default function SignInPage() {
             type="password"
             name="password"
             className={css.input}
-            autoComplete="current-password"
+            autoComplete="new-password"
             required
             onChange={() => error && setError("")}
           />
         </div>
 
         <div className={css.actions}>
-          <button type="submit" className={css.submitButton} disabled={isPending} aria-busy={isPending}>
-            {isPending ? "Logging in..." : "Log in"}
+          <button
+            type="submit"
+            className={css.submitButton}
+            disabled={isPending}
+            aria-busy={isPending}
+          >
+            {isPending ? "Registering..." : "Register"}
           </button>
         </div>
 

@@ -1,30 +1,34 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { registerUser } from "@/lib/api/clientApi";
+import { loginUser } from "@/lib/api/clientApi";
 import { useAuthStore } from "@/lib/store/authStore";
-import css from "./SignUpPage.module.css";
+import css from "./SignInPage.module.css";
 
 interface ApiError {
   response?: { data?: { message?: string } };
 }
 
-export default function SignUpPage() {
+export default function SignInPage() {
   const router = useRouter();
+  const sp = useSearchParams();
+  const rawFrom = sp.get("from");
+  const from = rawFrom ? decodeURIComponent(rawFrom) : "/profile";
+
   const setUser = useAuthStore((s) => s.setUser);
   const [error, setError] = useState("");
 
   const { mutate, isPending } = useMutation({
     mutationFn: ({ email, password }: { email: string; password: string }) =>
-      registerUser(email, password),
+      loginUser(email, password),
     onSuccess: (user) => {
       setUser(user);
-      router.replace("/profile");
+      router.replace(from);
     },
     onError: (err: ApiError) => {
-      setError(err?.response?.data?.message || "Registration failed");
+      setError(err?.response?.data?.message || "Login failed");
     },
   });
 
@@ -39,8 +43,9 @@ export default function SignUpPage() {
 
   return (
     <main className={css.mainContent}>
-      <h1 className={css.formTitle}>Sign up</h1>
       <form className={css.form} onSubmit={handleSubmit}>
+        <h1 className={css.formTitle}>Sign in</h1>
+
         <div className={css.formGroup}>
           <label htmlFor="email">Email</label>
           <input
@@ -61,15 +66,20 @@ export default function SignUpPage() {
             type="password"
             name="password"
             className={css.input}
-            autoComplete="new-password"
+            autoComplete="current-password"
             required
             onChange={() => error && setError("")}
           />
         </div>
 
         <div className={css.actions}>
-          <button type="submit" className={css.submitButton} disabled={isPending} aria-busy={isPending}>
-            {isPending ? "Registering..." : "Register"}
+          <button
+            type="submit"
+            className={css.submitButton}
+            disabled={isPending}
+            aria-busy={isPending}
+          >
+            {isPending ? "Logging in..." : "Log in"}
           </button>
         </div>
 

@@ -26,7 +26,7 @@ export default function AuthNavigation() {
     } finally {
       clearAuth();
       qc.clear();
-      router.replace(`/sign-in?from=${encodeURIComponent(pathname)}`);
+      router.replace(`/sign-in?from=${pathname}`);
     }
   };
 
